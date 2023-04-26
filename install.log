@@ -1,0 +1,27 @@
+setup log
+
+# install python
+
+sudo apt install python3
+sudo apt install python-is-python3
+
+# setup separate python dependancy environment
+
+sudo apt install python3.10-venv
+python -m venv venv
+source venv/bin/activate
+
+# install requirements
+
+cd cargoroo
+vim requirements.txt
+pip install --upgrade pip
+pip install -r requirements.txt
+
+
+
+
+
+
+
+
