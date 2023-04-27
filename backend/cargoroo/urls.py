@@ -15,9 +15,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.schemas import get_schema_view
+from rest_framework.documentation import include_docs_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest/v1/fleet/', include('fleet.urls')),
     path('rest/v1/csrf/', include('csrf.urls')),
+    path('rest/v1/schema', include('csrf.urls')),
+    path('rest/v1/schema/', get_schema_view(
+        title='Cargoroo REST API', 
+        description='REST APU to access Fleets and Bikes.', 
+        version='1.0.0')
+    ),
+    path('rest/v1/docs/', include_docs_urls(title='Cargoroo REST API fro fleets of bikes'))
 ]
