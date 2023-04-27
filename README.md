@@ -2,6 +2,7 @@
 
 Cargo bike api
 
+
 GET    http://localhost:8000/rest/v1/docs                   Show API documentation
 
 GET    http://localhost:8000/rest/v1/fleet                  List all fleets
@@ -14,3 +15,7 @@ PUT    http://localhost:8000/rest/v1/fleet/<id>/bike        Create a new bike in
 POST   http://localhost:8000/rest/v1/bike/<id>              Update bike <id> (move bikes between fleets)
 DELETE http://localhost:8000/rest/v1/bike/<id>              Delete bike <id>
 
+Out of scope:
+- authetication
+- hardening
+- csrf
