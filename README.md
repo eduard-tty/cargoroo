@@ -6,6 +6,7 @@ Cargo bike api
 GET    http://localhost:8000/rest/v1/docs                   Show API documentation
 
 GET    http://localhost:8000/rest/v1/fleet                  List all fleets
+GET    http://localhost:8000/rest/v1/fleet/<id>             Show fleet with id <id>
 PUT    http://localhost:8000/rest/v1/fleet                  Create a new fleet
 POST   http://localhost:8000/rest/v1/fleet/<id>             Update a fleet
 DELETE http://localhost:8000/rest/v1/fleet/<id>             Delete a fleet (that has no bikes in it)
