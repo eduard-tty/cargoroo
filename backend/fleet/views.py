@@ -24,15 +24,18 @@ def get_list_of_fleets(request, *args, **kwargs):
 
 
 def create_a_fleet(request, *args, **kwargs):
-    data = {
-        'method' : 'PUT',
-    }
+    postdata = request.POST
+    fleet = Fleet(id=postdata['id'], name=postdata['name'])
+    fleet.save()
+    data = FleetSerializer(fleet).data
     return JsonResponse( data )
 
 def update_a_fleet(request, *args, **kwargs):
-    data = {
-        'method' : 'POST',
-    }
+    postdata = request.POST
+    fleet = Fleet.objects.get(id=id)  # TODO not found
+    fleet.name = postdata['name']
+    fleet.save()
+    data = FleetSerializer(fleet).data
     return JsonResponse( data )
 
 def delete_a_fleet(request, *args, **kwargs):
