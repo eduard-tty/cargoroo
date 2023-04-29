@@ -22,9 +22,8 @@ title:str = 'Cargoroo REST API'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('rest/v1/fleet/', include('fleet.urls')),
+    path('rest/v1/', include('fleet.urls')),
     path('rest/v1/csrf/', include('csrf.urls')),
-    path('rest/v1/schema', include('csrf.urls')),
     path('rest/v1/schema/', get_schema_view(
         title=title,
         description='REST API to access Fleets and Bikes.',
