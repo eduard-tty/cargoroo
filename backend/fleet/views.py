@@ -41,7 +41,7 @@ def create_a_fleet(request, id, *args, **kwargs):
     fleet = Fleet(id=id, name=request.POST['name'])
     fleet.save()
     data = FleetSerializer(fleet).data
-    return JsonResponse(data)
+    return JsonResponse(data, status = status.HTTP_201_CREATED)
 
 
 def update_a_fleet(request, id, *args, **kwargs):
@@ -124,7 +124,7 @@ def create_a_bike(request, id, *args, **kwargs):
         bike = Bike(id=id, fleet=fleet, latitude=latitude, longitude=longitude, status='unlocked')
         bike.save()
         data = BikeSerializer(bike).data
-        return JsonResponse(data)
+        return JsonResponse(data,  status = status.HTTP_201_CREATED)
 
 
 def update_a_bike(request, id, *args, **kwargs):
