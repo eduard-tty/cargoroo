@@ -14,8 +14,8 @@ GET    http://localhost:8000/rest/v1/docs                   Show API documentati
 
 GET    http://localhost:8000/rest/v1/fleet                  List all fleets
 GET    http://localhost:8000/rest/v1/fleet/<id>             Show fleet with id <id>
-PUT    http://localhost:8000/rest/v1/fleet/<id>             Create a new fleet
-POST   http://localhost:8000/rest/v1/fleet/<id>             Update a fleet
+POST   http://localhost:8000/rest/v1/fleet/<id>             Create a new fleet
+PUT    http://localhost:8000/rest/v1/fleet/<id>             Update a fleet
 DELETE http://localhost:8000/rest/v1/fleet/<id>             Delete a fleet AND IT'S BIKES!
 
 # bikes in fleets
@@ -25,8 +25,8 @@ GET    http://localhost:8000/rest/v1/fleet/<id>/bike        List all bikes in fl
 # bikes
 
 GET    http://localhost:8000/rest/v1/bike/<id>              Show bike with id <id>
-PUT    http://localhost:8000/rest/v1/bike/<id>     e        Create a new bike in fleet
-POST   http://localhost:8000/rest/v1/bike/<id>              Update bike <id> (move bikes between fleets)
+POST   http://localhost:8000/rest/v1/bike/<id>              Create a new bike in fleet
+PUT    http://localhost:8000/rest/v1/bike/<id>              Update bike <id> (move bikes between fleets)
 DELETE http://localhost:8000/rest/v1/bike/<id>              Delete bike <id>
 
 

@@ -14,14 +14,14 @@ def list_fleets(request, *args, **kwargs):
     data = [ FleetSerializer(x).data for x in Fleet.objects.all() ]
     return JsonResponse( data, safe=False )
 
-@api_view(['GET','PUT','POST', 'DELETE'])
+@api_view(['GET','POST','PUT', 'DELETE'])
 def fleet_id_dispatch(request, id, *args, **kwargs):
     try:    
         if request.method == "GET":
             return show_fleet(request, id, args, kwargs)
-        elif request.method == "PUT":
-            return create_a_fleet(request, id, args, kwargs)
         elif request.method == "POST":
+            return create_a_fleet(request, id, args, kwargs)
+        elif request.method == "PUT":
             return update_a_fleet(request, id, args, kwargs)
         elif request.method == "DELETE":
             return delete_a_fleet(request, id, args, kwargs)
@@ -76,14 +76,14 @@ def list_bikes_in_fleet(request, id, *args, **kwargs):
 
 ## Bikes ##
 
-@api_view(['GET','PUT','POST', 'DELETE'])
+@api_view(['GET','POST','PUT', 'DELETE'])
 def bike_id_dispatch(request, id, *args, **kwargs):
     try:    
         if request.method == "GET":
             return show_bike(request, id, args, kwargs)
-        elif request.method == "PUT":
-            return create_a_bike(request, id, args, kwargs)
         elif request.method == "POST":
+            return create_a_bike(request, id, args, kwargs)
+        elif request.method == "PUT":
             return update_a_bike(request, id, args, kwargs)
         elif request.method == "DELETE":
             return delete_a_bike(request, id, args, kwargs)
