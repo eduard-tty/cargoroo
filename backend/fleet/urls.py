@@ -6,4 +6,5 @@ urlpatterns = [
     path('fleet/<str:id>', views.fleet_id_dispatch),
     path('fleet/<str:id>/bike', views.list_bikes_in_fleet),
     path('bike/<str:id>', views.bike_id_dispatch),
+    path('bike/<str:id>', views.bike_id_dispatch),
 ]
