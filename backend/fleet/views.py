@@ -87,7 +87,6 @@ def bike_id_dispatch(request, id, *args, **kwargs):
     if request.method == "GET":
         return show_bike(request, id, args, kwargs)
     elif request.method == "POST":
-        print('1')
         return create_a_bike(request, id, args, kwargs)
     elif request.method == "PUT":
         return update_a_bike(request, id, args, kwargs)
@@ -114,14 +113,26 @@ def create_a_bike(request, id, *args, **kwargs):
         error = "Fleet '{}' not found".format(fleet_id)
         return Response(error, status=status.HTTP_404_NOT_FOUND)
     else:
-        bike = Bike(id=id, fleet=fleet, status='unlocked')
+        lat = request.POST['latitude']
+        long = request.POST['longitude']
+        try:
+            latitude = float(lat)
+            longitude = float(long)           
+        except:
+            error = "Location format error in latitude '{}' and/or longitude '{}' ".format(lat, long)
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+        bike = Bike(id=id, fleet=fleet, latitude=latitude, longitude=longitude, status='unlocked')
         bike.save()
         data = BikeSerializer(bike).data
         return JsonResponse(data)
 
 
+ 
+
 def update_a_bike(request, id, *args, **kwargs):
     fleet_id = request.POST['fleet']
+    lat = request.POST['latitude']
+    long = request.POST['longitude']
     fleet = Fleet.objects.filter(id=fleet_id).first()
     if None == fleet:
         error = "Fleet '{}' not found".format(fleet_id)
@@ -132,8 +143,16 @@ def update_a_bike(request, id, *args, **kwargs):
             error = "Bike '{}' not found".format(id)
             return Response(error, status=status.HTTP_404_NOT_FOUND)
         else:
+            try:
+                latitude = float(lat)
+                longitude = float(long)           
+            except:
+                error = "Location format error in latitude '{}' and/or longitude '{}' ".format(lat, long)
+                return Response(error, status=status.HTTP_400_BAD_REQUEST)
             bike.fleet = fleet
             bike.status = request.POST['status']
+            bike.latitude=latitude
+            bike.longitude=longitude
             bike.save()
             data = BikeSerializer(bike).data
             return JsonResponse(data)
