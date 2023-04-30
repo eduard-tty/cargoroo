@@ -127,8 +127,6 @@ def create_a_bike(request, id, *args, **kwargs):
         return JsonResponse(data)
 
 
- 
-
 def update_a_bike(request, id, *args, **kwargs):
     fleet_id = request.POST['fleet']
     lat = request.POST['latitude']
@@ -150,7 +148,7 @@ def update_a_bike(request, id, *args, **kwargs):
                 error = "Location format error in latitude '{}' and/or longitude '{}' ".format(lat, long)
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
             bike.fleet = fleet
-            bike.status = request.POST['status']
+            bike.status = request.POST['status']  # check status
             bike.latitude=latitude
             bike.longitude=longitude
             bike.save()
