@@ -15,24 +15,23 @@ def list_fleets(request, *args, **kwargs):
 
 @api_view(['GET','POST','PUT', 'DELETE'])
 def fleet_id_dispatch(request, id, *args, **kwargs):
-    try:    
-        if request.method == "GET":
-            return show_fleet(request, id, args, kwargs)
-        elif request.method == "POST":
-            return create_a_fleet(request, id, args, kwargs)
-        elif request.method == "PUT":
-            return update_a_fleet(request, id, args, kwargs)
-        elif request.method == "DELETE":
-            return delete_a_fleet(request, id, args, kwargs)
-        else:
-            raise "Unexpected http method: '{}'".format(request.method)
-    except:
-        return Response('', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    if request.method == "GET":
+        return show_fleet(request, id, args, kwargs)
+    elif request.method == "POST":
+        return create_a_fleet(request, id, args, kwargs)
+    elif request.method == "PUT":
+        return update_a_fleet(request, id, args, kwargs)
+    elif request.method == "DELETE":
+        return delete_a_fleet(request, id, args, kwargs)
+    else:
+        error = "Unexpected HTTP method '{}'".format(request.method)
+        return Response(error, status=status.HTTP_404_NOT_FOUND)
 
 def show_fleet(request, id, *args, **kwargs):
     fleet = Fleet.objects.filter(id=id).first()
     if None == fleet:
-        return Response('', status=status.HTTP_404_NOT_FOUND)
+        error = "Fleet '{}' not found".format(id)
+        return Response(error, status=status.HTTP_404_NOT_FOUND)
     else:
         data = FleetSerializer(fleet).data
         return JsonResponse(data, safe=False)
@@ -48,7 +47,8 @@ def create_a_fleet(request, id, *args, **kwargs):
 def update_a_fleet(request, id, *args, **kwargs):
     fleet = Fleet.objects.filter(id=id).first()
     if None == fleet:
-        return Response('', status=status.HTTP_404_NOT_FOUND)
+        error = "Fleet '{}' not found".format(id)
+        return Response(error, status=status.HTTP_404_NOT_FOUND)
     else:
         fleet.name = request.POST['name']
         fleet.save()
@@ -59,7 +59,8 @@ def update_a_fleet(request, id, *args, **kwargs):
 def delete_a_fleet(request, id, *args, **kwargs):
     fleet = Fleet.objects.filter(id=id).first()
     if None == fleet:
-        return Response('', status=status.HTTP_404_NOT_FOUND)
+        error = "Fleet '{}' not found".format(id)
+        return Response(error, status=status.HTTP_404_NOT_FOUND)
     else:
         data = FleetSerializer(fleet).data
         fleet.delete()
@@ -67,11 +68,17 @@ def delete_a_fleet(request, id, *args, **kwargs):
 
 @api_view(['GET'])
 def list_bikes_in_fleet(request, id, *args, **kwargs):
-    try:
-        data = [ BikeSerializer(x).data for x in Bike.objects.filter(fleet=id).all() ]
-        return JsonResponse( data, safe=False)
-    except:
-        return Response('', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    fleet = Fleet.objects.filter(id=id).first()
+    if None == fleet:
+        error = "Fleet '{}' not found".format(id)
+        return Response(error, status=status.HTTP_404_NOT_FOUND)
+    else:
+        try:
+            data = [ BikeSerializer(x).data for x in Bike.objects.filter(fleet=id).all() ]
+            return JsonResponse( data, safe=False)
+        except:
+            error = "Error loading bikes for fleet '{}'".format(id)
+            return Response(error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 ## Bikes ##
 
@@ -87,12 +94,14 @@ def bike_id_dispatch(request, id, *args, **kwargs):
     elif request.method == "DELETE":
         return delete_a_bike(request, id, args, kwargs)
     else:
-        raise "Unexpected http method: '{}'".format(request.method)
+        error = "Unexpected HTTP method '{}'".format(request.method)
+        return Response(error, status=status.HTTP_404_NOT_FOUND)
 
 def show_bike(request, id, *args, **kwargs):
     bike = Bike.objects.filter(id=id).first()
     if None == bike:
-        return Response('', status=status.HTTP_404_NOT_FOUND)
+        error = "Bike '{}' not found".format(id)
+        return Response(error, status=status.HTTP_404_NOT_FOUND)
     else:
         data = BikeSerializer(bike).data
         return JsonResponse(data, safe=False)
