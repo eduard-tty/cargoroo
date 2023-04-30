@@ -4,19 +4,25 @@ from .models import Fleet, Bike
 from .serializers import FleetSerializer, BikeSerializer
 import io
 from rest_framework.parsers import JSONParser
+import time
 
 class FleetTestCase(APITestCase):
 
+    AMSTERDAM_LAT  = 52.377956
+    AMSTERDAM_LONG = 4.897070
 
     def setUp(self):
-        Fleet.objects.create(id='FL_001', name = 'Fleet one')
-        Fleet.objects.create(id='FL_002', name = 'Fleet two')
+        fleet1 = Fleet.objects.create(id='FL_001', name = 'Fleet one')
+        Bike.objects.create(id='BK_001', fleet = fleet1, status = 'unlocked', latitude=self.AMSTERDAM_LAT, longitude=self.AMSTERDAM_LONG)
+        Bike.objects.create(id='BK_002', fleet = fleet1, status = 'locked', latitude=self.AMSTERDAM_LAT, longitude=self.AMSTERDAM_LONG)
+        fleet2 = Fleet.objects.create(id='FL_002', name = 'Fleet two')
+        Bike.objects.create(id='BK_003', fleet = fleet2, status = 'unlocked', latitude=self.AMSTERDAM_LAT, longitude=self.AMSTERDAM_LONG)
         
 
     def test_list_fleets(self):
         url = 'http://localhost:8000/rest/v1/fleet/'
         response = self.client.get(url, folow=True)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
         data = JSONParser().parse(io.BytesIO(response.content))
         self.assertEqual(data[0]['id'], 'FL_001')
         self.assertEqual(data[0]['name'], 'Fleet one')
@@ -29,17 +35,17 @@ class FleetTestCase(APITestCase):
         url = "http://localhost:8000/rest/v1/fleet/{}".format(id)
         fleet_data = { 'name' : name }
         response = self.client.post(url, data=fleet_data, folow=True)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(3, Fleet.objects.count())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Returns CREATED')
+        self.assertEqual(3, Fleet.objects.count(), 'Has 3 fleets')
         fleet999 = Fleet.objects.filter(id=id).first()
-        self.assertEqual(fleet999.id, id)
-        self.assertEqual(fleet999.name, name)
+        self.assertEqual(fleet999.id, id, 'Fleet id unchaged')
+        self.assertEqual(fleet999.name, name, 'Fleet name updated')
         
     def test_show_a_fleet(self):
         id = 'FL_001'
         url = "http://localhost:8000/rest/v1/fleet/{}".format(id)
         response = self.client.get(url, folow=True)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
         data = JSONParser().parse(io.BytesIO(response.content))
         self.assertEqual(data['id'], 'FL_001')
         self.assertEqual(data['name'], 'Fleet one')
@@ -50,7 +56,7 @@ class FleetTestCase(APITestCase):
         url = "http://localhost:8000/rest/v1/fleet/{}".format(id)
         fleet_data = { 'name' : name }
         response = self.client.put(url, data=fleet_data, folow=True)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
         fleet1 = Fleet.objects.filter(id=id).first()
         self.assertEqual(fleet1.id, id, "Id is unchaged")
         self.assertEqual(fleet1.name, name, "Name is updated")
@@ -60,7 +66,7 @@ class FleetTestCase(APITestCase):
         id = 'FL_001'
         url = "http://localhost:8000/rest/v1/fleet/{}".format(id)
         response = self.client.delete(url, folow=True)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
         fleet1 = Fleet.objects.filter(id=id).first()
         self.assertEqual(fleet1, None)
         # Return deleted data in response
@@ -68,3 +74,79 @@ class FleetTestCase(APITestCase):
         self.assertEqual(data['id'], 'FL_001')
         self.assertEqual(data['name'], 'Fleet one')
 
+    def test_list_bikes_in_fleet(self):
+        id = 'FL_001'
+        url = "http://localhost:8000/rest/v1/fleet/{}/bike".format(id)
+        response = self.client.get(url, folow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
+        data = JSONParser().parse(io.BytesIO(response.content))
+        self.assertEqual(2, len(data), 'returns 2 bikes')
+
+
+    def test_create_bike(self):
+        id = 'BK_999'
+        fid = 'FL_001'
+        url = "http://localhost:8000/rest/v1/bike/{}".format(id)
+        bike_data = { 
+            'fleet': fid,
+            'status': 'unlocked',
+            'latitude' : self.AMSTERDAM_LAT,
+            'longitude' : self.AMSTERDAM_LONG,
+        }
+        response = self.client.post(url, data=bike_data, folow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Returns CREATED')
+        bike999 = Bike.objects.filter(id=id).first()
+        self.assertEqual(bike999.id, id)
+        self.assertEqual(bike999.fleet.id, fid)
+        self.assertEqual(bike999.status, 'unlocked')
+        self.assertEqual(bike999.latitude, self.AMSTERDAM_LAT)
+        self.assertEqual(bike999.longitude, self.AMSTERDAM_LONG)
+        
+    def test_show_a_bike(self):
+        id = 'BK_003'
+        url = "http://localhost:8000/rest/v1/bike/{}".format(id)
+        response = self.client.get(url, folow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
+        data = JSONParser().parse(io.BytesIO(response.content))
+        self.assertEqual(data['id'], id)
+        self.assertEqual(data['fleet'], 'FL_002')
+        self.assertEqual(data['status'], 'unlocked')
+        self.assertEqual(data['latitude'], self.AMSTERDAM_LAT)
+        self.assertEqual(data['longitude'], self.AMSTERDAM_LONG)      
+
+    def test_update_a_bike(self):
+        id = 'BK_003'
+        fid = 'FL_002'
+        url = "http://localhost:8000/rest/v1/bike/{}".format(id)
+        bike_data = { 
+            'fleet': fid,
+            'status': 'locked',
+            'latitude' : 1.0,
+            'longitude' : 1.0,
+        }
+        response = self.client.put(url, data=bike_data, folow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
+        bike1 = Bike.objects.filter(id=id).first()
+        self.assertEqual(bike1.id, id, "Id is unchaged")
+        self.assertEqual(bike1.fleet.id, fid)
+        self.assertEqual(bike1.status, 'locked')
+        self.assertEqual(bike1.latitude, 1.0)
+        self.assertEqual(bike1.longitude, 1.0)
+        
+
+    def test_delete_a_bike(self):
+        id = 'BK_001'
+        url = "http://localhost:8000/rest/v1/bike/{}".format(id)
+        response = self.client.delete(url, folow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
+        self.assertEqual(Fleet.objects.filter(id=id).first(), None, 'Bike is gone')
+        # Return deleted data in response
+        data = JSONParser().parse(io.BytesIO(response.content))
+        self.assertEqual(data['id'], id)
+        self.assertEqual(data['fleet'], 'FL_001')
+        self.assertEqual(data['status'], 'unlocked')
+        self.assertEqual(data['latitude'], self.AMSTERDAM_LAT)
+        self.assertEqual(data['longitude'], self.AMSTERDAM_LONG)
+        
+        
+        
