@@ -57,14 +57,3 @@ GET    http://localhost:8000/rest/v1/bike/<id>              Show bike with id <i
 POST   http://localhost:8000/rest/v1/bike/<id>              Create a new bike in fleet
 PUT    http://localhost:8000/rest/v1/bike/<id>              Update bike <id> (move bikes between fleets)
 DELETE http://localhost:8000/rest/v1/bike/<id>              Delete bike <id>
-
-
-
-
-Out of scope:
-- authetication
-- hardening
-- csrf
-
-Inspiration: https://www.bezkoder.com/django-rest-api/
-
