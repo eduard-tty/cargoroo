@@ -13,15 +13,15 @@ def list_fleets(request, *args, **kwargs):
 
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
-def fleet_id_dispatch(request, id, *args, **kwargs):  # TODO: fid?
+def fleet_id_dispatch(request, fid, *args, **kwargs):
     if request.method == "GET":
-        return show_fleet(request, id, args, kwargs)
+        return show_fleet(request, fid, args, kwargs)
     if request.method == "POST":
-        return create_a_fleet(request, id, args, kwargs)
+        return create_a_fleet(request, fid, args, kwargs)
     if request.method == "PUT":
-        return update_a_fleet(request, id, args, kwargs)
+        return update_a_fleet(request, fid, args, kwargs)
     if request.method == "DELETE":
-        return delete_a_fleet(request, id, args, kwargs)
+        return delete_a_fleet(request, fid, args, kwargs)
     error = f"Unexpected HTTP method '{request.method}'"
     return Response(error, status=status.HTTP_404_NOT_FOUND)
 
@@ -45,10 +45,10 @@ def create_a_fleet(request, fid, *args, **kwargs):
     return JsonResponse(data, status=status.HTTP_201_CREATED)
 
 
-def update_a_fleet(request, id, *args, **kwargs):
-    fleet = Fleet.objects.filter(id=id).first()
+def update_a_fleet(request, fid, *args, **kwargs):
+    fleet = Fleet.objects.filter(id=fid).first()
     if fleet is None:
-        error = f"Fleet '{id}' not found"
+        error = f"Fleet '{fid}' not found"
         return Response(error, status=status.HTTP_404_NOT_FOUND)
     name = request.POST.get('name')
     if name is not None:
@@ -69,38 +69,38 @@ def delete_a_fleet(request, fid, *args, **kwargs):
 
 
 @api_view(['GET'])
-def list_bikes_in_fleet(request, id, *args, **kwargs):
-    fleet = Fleet.objects.filter(id=id).first()
+def list_bikes_in_fleet(request, fid, *args, **kwargs):
+    fleet = Fleet.objects.filter(id=fid).first()
     if fleet is None:
-        error = f"Fleet '{id}' not found"
+        error = f"Fleet '{fid}' not found"
         return Response(error, status=status.HTTP_404_NOT_FOUND)
-    data = [BikeSerializer(x).data for x in Bike.objects.filter(fleet=id).all()]
+    data = [BikeSerializer(x).data for x in Bike.objects.filter(fleet=fid).all()]
     return JsonResponse(data, safe=False)
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
-def bike_id_dispatch(request, id, *args, **kwargs):
+def bike_id_dispatch(request, bid, *args, **kwargs):
     if request.method == "GET":
-        return show_bike(request, id, args, kwargs)
+        return show_bike(request, bid, args, kwargs)
     if request.method == "POST":
-        return create_a_bike(request, id, args, kwargs)
+        return create_a_bike(request, bid, args, kwargs)
     if request.method == "PUT":
-        return update_a_bike(request, id, args, kwargs)
+        return update_a_bike(request, bid, args, kwargs)
     if request.method == "DELETE":
-        return delete_a_bike(request, id, args, kwargs)
+        return delete_a_bike(request, bid, args, kwargs)
     error = f"Unexpected HTTP method '{request.method}'"
     return Response(error, status=status.HTTP_404_NOT_FOUND)
 
 
-def show_bike(request, id, *args, **kwargs):
-    bike = Bike.objects.filter(id=id).first()
+def show_bike(request, bid, *args, **kwargs):
+    bike = Bike.objects.filter(id=bid).first()
     if bike is None:
-        error = f"Bike '{id}' not found"
+        error = f"Bike '{bid}' not found"
         return Response(error, status=status.HTTP_404_NOT_FOUND)
     data = BikeSerializer(bike).data
     return JsonResponse(data, safe=False)
 
 
-def create_a_bike(request, id, *args, **kwargs):
+def create_a_bike(request, bid, *args, **kwargs):
     fleet_id = request.POST.get('fleet')
     bike_status = request.POST.get('status')
     fleet = Fleet.objects.filter(id=fleet_id).first()
@@ -119,7 +119,7 @@ def create_a_bike(request, id, *args, **kwargs):
         error = f"Illegal status '{bike_status}'"
         return Response(error, status=status.HTTP_400_BAD_REQUEST)
     bike = Bike(
-        id=id,
+        id=bid,
         fleet=fleet,
         latitude=latitude,
         longitude=longitude,
