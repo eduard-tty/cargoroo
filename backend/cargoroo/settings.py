@@ -53,7 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-   ]
+]
 
 ROOT_URLCONF = 'cargoroo.urls'
 
@@ -111,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC' # Leave on UTC because of multiple countries
+TIME_ZONE = 'UTC'  # Leave on UTC because of multiple countries
 
 USE_I18N = True
 

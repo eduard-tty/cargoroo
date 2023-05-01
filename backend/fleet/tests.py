@@ -1,10 +1,8 @@
+import io
 from rest_framework import status
 from rest_framework.test import APITestCase
-from .models import Fleet, Bike
-from .serializers import FleetSerializer, BikeSerializer
-import io
 from rest_framework.parsers import JSONParser
-import time
+from .models import Fleet, Bike
 
 class FleetTestCase(APITestCase):
 
