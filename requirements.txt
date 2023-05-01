@@ -3,5 +3,4 @@ djangorestframework
 django-cors-headers
 pyyaml
 requests
-coreapi
 pylint-django

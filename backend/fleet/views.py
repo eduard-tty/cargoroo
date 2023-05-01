@@ -5,30 +5,30 @@ from rest_framework import status
 from .models import Fleet, Bike
 from .serializers import FleetSerializer, BikeSerializer
 
-## Fleets ##
-
 
 @api_view(['GET'])
 def list_fleets(request, *args, **kwargs):
+    ''' Return a JSON list of all fleets. '''
     data = [FleetSerializer(x).data for x in Fleet.objects.all()]
     return JsonResponse(data, safe=False)
 
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
-def fleet_id_dispatch(request, id, *args, **kwargs):
+def fleet_id_dispatch(request, fid, *args, **kwargs):
     if request.method == "GET":
-        return show_fleet(request, id, args, kwargs)
+        return show_fleet(request, fid, args, kwargs) 
     if request.method == "POST":
-        return create_a_fleet(request, id, args, kwargs)
+        return create_a_fleet(request, fid, args, kwargs)
     if request.method == "PUT":
-        return update_a_fleet(request, id, args, kwargs)
+        return update_a_fleet(request, fid, args, kwargs)
     if request.method == "DELETE":
-        return delete_a_fleet(request, id, args, kwargs)
+        return delete_a_fleet(request, fid, args, kwargs)
     error = f"Unexpected HTTP method '{request.method}'"
     return Response(error, status=status.HTTP_404_NOT_FOUND)
 
-
+@api_view(['GET'])
 def show_fleet(request, id, *args, **kwargs):
+    ''' Show all details of a fleet. '''
     fleet = Fleet.objects.filter(id=id).first()
     if fleet is None:
         error = f"Fleet '{id}' not found"
