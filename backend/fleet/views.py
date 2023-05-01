@@ -58,10 +58,10 @@ def update_a_fleet(request, id, *args, **kwargs):
     return JsonResponse(data)
 
 
-def delete_a_fleet(request, id, *args, **kwargs):
-    fleet = Fleet.objects.filter(id=id).first()
+def delete_a_fleet(request, fid, *args, **kwargs):
+    fleet = Fleet.objects.filter(id=fid).first()
     if fleet is None:
-        error = f"Fleet '{id}' not found"
+        error = f"Fleet '{fid}' not found"
         return Response(error, status=status.HTTP_404_NOT_FOUND)
     data = FleetSerializer(fleet).data
     fleet.delete()
