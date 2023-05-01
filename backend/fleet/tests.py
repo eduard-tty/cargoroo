@@ -21,7 +21,7 @@ class FleetTestCase(APITestCase):
 
     def test_list_fleets(self):
         url = '/rest/v1/fleet/'
-        response = self.client.get(url, folow=True)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
         data = JSONParser().parse(io.BytesIO(response.content))
         self.assertEqual(data[0]['id'], 'FL_001')
@@ -34,7 +34,7 @@ class FleetTestCase(APITestCase):
         name = 'Automated Testing Fleet 999'
         url = "/rest/v1/fleet/{}".format(id)
         fleet_data = { 'name' : name }
-        response = self.client.post(url, data=fleet_data, folow=True)
+        response = self.client.post(url, data=fleet_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Returns CREATED')
         self.assertEqual(3, Fleet.objects.count(), 'Has 3 fleets')
         fleet999 = Fleet.objects.filter(id=id).first()
@@ -44,7 +44,7 @@ class FleetTestCase(APITestCase):
     def test_show_a_fleet(self):
         id = 'FL_001'
         url = "/rest/v1/fleet/{}".format(id)
-        response = self.client.get(url, folow=True)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
         data = JSONParser().parse(io.BytesIO(response.content))
         self.assertEqual(data['id'], 'FL_001')
@@ -55,7 +55,7 @@ class FleetTestCase(APITestCase):
         name = 'Updated name'
         url = "/rest/v1/fleet/{}".format(id)
         fleet_data = { 'name' : name }
-        response = self.client.put(url, data=fleet_data, folow=True)
+        response = self.client.put(url, data=fleet_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
         fleet1 = Fleet.objects.filter(id=id).first()
         self.assertEqual(fleet1.id, id, "Id is unchaged")
@@ -65,7 +65,7 @@ class FleetTestCase(APITestCase):
     def test_delete_a_fleet(self):
         id = 'FL_001'
         url = "/rest/v1/fleet/{}".format(id)
-        response = self.client.delete(url, folow=True)
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
         fleet1 = Fleet.objects.filter(id=id).first()
         self.assertEqual(fleet1, None)
@@ -77,7 +77,7 @@ class FleetTestCase(APITestCase):
     def test_list_bikes_in_fleet(self):
         id = 'FL_001'
         url = "/rest/v1/fleet/{}/bike".format(id)
-        response = self.client.get(url, folow=True)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
         data = JSONParser().parse(io.BytesIO(response.content))
         self.assertEqual(2, len(data), 'returns 2 bikes')
@@ -93,7 +93,7 @@ class FleetTestCase(APITestCase):
             'latitude' : self.AMSTERDAM_LAT,
             'longitude' : self.AMSTERDAM_LONG,
         }
-        response = self.client.post(url, data=bike_data, folow=True)
+        response = self.client.post(url, data=bike_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Returns CREATED')
         bike999 = Bike.objects.filter(id=id).first()
         self.assertEqual(bike999.id, id)
@@ -105,7 +105,7 @@ class FleetTestCase(APITestCase):
     def test_show_a_bike(self):
         id = 'BK_003'
         url = "/rest/v1/bike/{}".format(id)
-        response = self.client.get(url, folow=True)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
         data = JSONParser().parse(io.BytesIO(response.content))
         self.assertEqual(data['id'], id)
@@ -124,7 +124,7 @@ class FleetTestCase(APITestCase):
             'latitude' : 1.0,
             'longitude' : 1.0,
         }
-        response = self.client.put(url, data=bike_data, folow=True)
+        response = self.client.put(url, data=bike_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
         bike1 = Bike.objects.filter(id=id).first()
         self.assertEqual(bike1.id, id, "Id is unchaged")
@@ -137,7 +137,7 @@ class FleetTestCase(APITestCase):
     def test_delete_a_bike(self):
         id = 'BK_001'
         url = "/rest/v1/bike/{}".format(id)
-        response = self.client.delete(url, folow=True)
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
         self.assertEqual(Fleet.objects.filter(id=id).first(), None, 'Bike is gone')
         # Return deleted data in response
@@ -164,24 +164,24 @@ class ErrorTestCase(APITestCase):
 
     def test_list_fleets(self):
         url = '/rest/v1/car/'
-        response = self.client.get(url, folow=True)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         url = '/rest/v2/fleet/'
-        response = self.client.get(url, folow=True)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         url = '/rest/fleet/'
-        response = self.client.get(url, folow=True)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         url = '/test/v1/fleet/'
-        response = self.client.get(url, folow=True)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_show_sleet(self):
         url = '/test/v1/fleet/not_a_fleet'
-        response = self.client.get(url, folow=True)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_fleet(self):
@@ -191,7 +191,7 @@ class ErrorTestCase(APITestCase):
         fleet_data = { 
             'title' : name,
         }
-        response = self.client.post(url, data=fleet_data, folow=True)
+        response = self.client.post(url, data=fleet_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
   
    
@@ -200,13 +200,13 @@ class ErrorTestCase(APITestCase):
         bike_data = { 
             'name' : 'Fleet name',
         }
-        response = self.client.put(url, data=bike_data, folow=True)
+        response = self.client.put(url, data=bike_data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
       
     def test_delete_a_fleet(self):
         id = 'not an id'
         url = "/rest/v1/fleet/{}".format(id)
-        response = self.client.delete(url, folow=True)
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_bike(self):
@@ -219,7 +219,7 @@ class ErrorTestCase(APITestCase):
             'latitude' : self.AMSTERDAM_LAT,
             'longitude' : self.AMSTERDAM_LONG,
         }
-        response = self.client.post(url, data=bike_data, folow=True)
+        response = self.client.post(url, data=bike_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
     
@@ -233,27 +233,27 @@ class ErrorTestCase(APITestCase):
             'latitude' : 1.0,
             'longitude' : 1.0,
         }
-        response = self.client.put(url, data=bike_data, folow=True)
+        response = self.client.put(url, data=bike_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         bike_data['fleet'] = fid
         bike_data['latitude'] = 'boo'
-        response = self.client.put(url, data=bike_data, folow=True)
+        response = self.client.put(url, data=bike_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
       
         bike_data['latitude'] = 1.0
         bike_data['status'] = 'blue'
-        response = self.client.put(url, data=bike_data, folow=True)
+        response = self.client.put(url, data=bike_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         
         bike_data['status'] = 'locked'  
         url = "/rest/v1/bike/{}".format('not an id')
-        response = self.client.put(url, data=bike_data, folow=True)
+        response = self.client.put(url, data=bike_data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
   
         
     def test_delete_a_bike(self):
         id = 'not an id'
         url = "/rest/v1/bike/{}".format(id)
-        response = self.client.delete(url, folow=True)
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
