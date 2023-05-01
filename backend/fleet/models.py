@@ -5,7 +5,7 @@ class Fleet(models.Model):
     name = models.CharField(max_length=200)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
     
 
 class Bike(models.Model):
@@ -25,4 +25,4 @@ class Bike(models.Model):
 
     
     def __str__(self):
-        return self.id
+        return str(self.id)
