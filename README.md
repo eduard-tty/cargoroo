@@ -27,6 +27,7 @@ session operates in a virtual environment.
 Once `pip` has finished downloading the dependencies:
 ```sh
 (env)$ cd backend
+(env)$ python manage.py migrate
 (env)$ python manage.py runserver
 ```
 
