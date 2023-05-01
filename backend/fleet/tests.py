@@ -28,22 +28,22 @@ class FleetTestCase(APITestCase):
         self.assertEqual(data[1]['name'], 'Fleet two')
 
     def test_create_fleet(self):
-        id = 'FL_999'
+        fid = 'FL_999'
         name = 'Automated Testing Fleet 999'
-        url = "/rest/v1/fleet/{}".format(id)
+        url = f"/rest/v1/fleet/{fid}"
         fleet_data = { 'name' : name }
         response = self.client.post(url, data=fleet_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, 'Returns CREATED')
         self.assertEqual(3, Fleet.objects.count(), 'Has 3 fleets')
-        fleet999 = Fleet.objects.filter(id=id).first()
-        self.assertEqual(fleet999.id, id, 'Fleet id unchaged')
+        fleet999 = Fleet.objects.filter(id=fid).first()
+        self.assertEqual(fleet999.id, fid, 'Fleet id unchaged')
         self.assertEqual(fleet999.name, name, 'Fleet name updated')
         
     def test_show_a_fleet(self):
         fid = 'FL_001'
-        url = "/rest/v1/fleet/{}".format(fid)
+        url = f"/rest/v1/fleet/{fid}"
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, 'Returns OK')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = JSONParser().parse(io.BytesIO(response.content))
         self.assertEqual(data['id'], 'FL_001')
         self.assertEqual(data['name'], 'Fleet one')

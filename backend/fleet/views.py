@@ -13,35 +13,33 @@ def list_fleets(request, *args, **kwargs):
 
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
-def fleet_id_dispatch(request, fid, *args, **kwargs):
+def fleet_id_dispatch(request, id, *args, **kwargs):  # TODO: fid?
     if request.method == "GET":
-        return show_fleet(request, fid, args, kwargs)
+        return show_fleet(request, id, args, kwargs)
     if request.method == "POST":
-        return create_a_fleet(request, fid, args, kwargs)
+        return create_a_fleet(request, id, args, kwargs)
     if request.method == "PUT":
-        return update_a_fleet(request, fid, args, kwargs)
+        return update_a_fleet(request, id, args, kwargs)
     if request.method == "DELETE":
-        return delete_a_fleet(request, fid, args, kwargs)
+        return delete_a_fleet(request, id, args, kwargs)
     error = f"Unexpected HTTP method '{request.method}'"
     return Response(error, status=status.HTTP_404_NOT_FOUND)
 
-
-@api_view(['GET'])
-def show_fleet(request, id, *args, **kwargs):
-    fleet = Fleet.objects.filter(id=id).first()
+def show_fleet(request, fid, *args, **kwargs):
+    fleet = Fleet.objects.filter(id=fid).first()
     if fleet is None:
-        error = f"Fleet '{id}' not found"
+        error = f"Fleet '{fid}' not found"
         return Response(error, status=status.HTTP_404_NOT_FOUND)
     data = FleetSerializer(fleet).data
     return JsonResponse(data, safe=False)
 
 
-def create_a_fleet(request, id, *args, **kwargs):
+def create_a_fleet(request, fid, *args, **kwargs):
     name = request.POST.get('name')
     if name is None:
         error = "name was missing from post data"
         return Response(error, status=status.HTTP_400_BAD_REQUEST)
-    fleet = Fleet(id=id, name=name)
+    fleet = Fleet(id=fid, name=name)
     fleet.save()
     data = FleetSerializer(fleet).data
     return JsonResponse(data, status=status.HTTP_201_CREATED)
@@ -49,8 +47,6 @@ def create_a_fleet(request, id, *args, **kwargs):
 
 def update_a_fleet(request, id, *args, **kwargs):
     fleet = Fleet.objects.filter(id=id).first()
-    if fleet is None:
-        error = f"Fleet '{id}' not found"
     if fleet is None:
         error = f"Fleet '{id}' not found"
         return Response(error, status=status.HTTP_404_NOT_FOUND)
@@ -64,9 +60,7 @@ def update_a_fleet(request, id, *args, **kwargs):
 
 def delete_a_fleet(request, id, *args, **kwargs):
     fleet = Fleet.objects.filter(id=id).first()
-    if None is fleet:
-        error = f"Fleet '{id}' not found"
-    if None is fleet:
+    if fleet is None:
         error = f"Fleet '{id}' not found"
         return Response(error, status=status.HTTP_404_NOT_FOUND)
     data = FleetSerializer(fleet).data
@@ -79,19 +73,9 @@ def list_bikes_in_fleet(request, id, *args, **kwargs):
     fleet = Fleet.objects.filter(id=id).first()
     if fleet is None:
         error = f"Fleet '{id}' not found"
-    if fleet is None:
-        error = f"Fleet '{id}' not found"
         return Response(error, status=status.HTTP_404_NOT_FOUND)
-    try:
-        data = [BikeSerializer(
-            x).data for x in Bike.objects.filter(fleet=id).all()]
-        return JsonResponse(data, safe=False)
-    except:
-        error = f"Error loading bikes for fleet '{id}'"
-        return Response(error, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-## Bikes ##
-
+    data = [BikeSerializer(x).data for x in Bike.objects.filter(fleet=id).all()]
+    return JsonResponse(data, safe=False)
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def bike_id_dispatch(request, id, *args, **kwargs):
@@ -111,8 +95,6 @@ def show_bike(request, id, *args, **kwargs):
     bike = Bike.objects.filter(id=id).first()
     if bike is None:
         error = f"Bike '{id}' not found"
-    if bike is None:
-        error = f"Bike '{id}' not found"
         return Response(error, status=status.HTTP_404_NOT_FOUND)
     data = BikeSerializer(bike).data
     return JsonResponse(data, safe=False)
@@ -130,20 +112,25 @@ def create_a_bike(request, id, *args, **kwargs):
     try:
         latitude = float(lat)
         longitude = float(long)
-    except:
+    except NameError:
         error = f"Location format error in latitude '{lat}' and/or longitude '{long}' "
         return Response(error, status=status.HTTP_400_BAD_REQUEST)
     if bike_status not in ('locked', 'unlocked'):
         error = f"Illegal status '{bike_status}'"
         return Response(error, status=status.HTTP_400_BAD_REQUEST)
-    bike = Bike(id=id, fleet=fleet, latitude=latitude,
-                longitude=longitude, status=bike_status)
+    bike = Bike(
+        id=id,
+        fleet=fleet,
+        latitude=latitude,
+        longitude=longitude,
+        status=bike_status,
+    )
     bike.save()
     data = BikeSerializer(bike).data
     return JsonResponse(data, status=status.HTTP_201_CREATED)
 
 
-def update_a_bike(request, id, *args, **kwargs):
+def update_a_bike(request, fid, *args, **kwargs):
     fleet_id = request.POST.get('fleet')
     lat = request.POST.get('latitude')
     long = request.POST.get('longitude')
@@ -151,17 +138,15 @@ def update_a_bike(request, id, *args, **kwargs):
     fleet = Fleet.objects.filter(id=fleet_id).first()
     if fleet is None:
         error = f"Fleet '{fleet_id}' not found"
-    if fleet is None:
-        error = f"Fleet '{fleet_id}' not found"
         return Response(error, status=status.HTTP_400_BAD_REQUEST)
-    bike = Bike.objects.filter(id=id).first()
+    bike = Bike.objects.filter(id=fid).first()
     if bike is None:
-        error = f"Bike '{id}' not found"
+        error = f"Bike '{fid}' not found"
         return Response(error, status=status.HTTP_404_NOT_FOUND)
     try:
         latitude = float(lat)
         longitude = float(long)
-    except:
+    except ValueError:
         error = f"Location format error in latitude '{lat}' and/or longitude '{long}' "
         return Response(error, status=status.HTTP_400_BAD_REQUEST)
     bike.fleet = fleet
@@ -179,8 +164,6 @@ def update_a_bike(request, id, *args, **kwargs):
 
 def delete_a_bike(request, bid, *args, **kwargs):
     bike = Bike.objects.filter(id=bid).first()
-    if bike is None:
-        error = f"Bike '{bid}' not found"
     if bike is None:
         error = f"Bike '{bid}' not found"
         return Response(error, status=status.HTTP_404_NOT_FOUND)
