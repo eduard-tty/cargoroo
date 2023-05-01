@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class Fleet(models.Model):
     id = models.CharField(max_length=6, primary_key=True)
     name = models.CharField(max_length=200)

@@ -8,7 +8,6 @@ from .serializers import FleetSerializer, BikeSerializer
 
 @api_view(['GET'])
 def list_fleets(request, *args, **kwargs):
-    ''' Return a JSON list of all fleets. '''
     data = [FleetSerializer(x).data for x in Fleet.objects.all()]
     return JsonResponse(data, safe=False)
 
@@ -16,7 +15,7 @@ def list_fleets(request, *args, **kwargs):
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def fleet_id_dispatch(request, fid, *args, **kwargs):
     if request.method == "GET":
-        return show_fleet(request, fid, args, kwargs) 
+        return show_fleet(request, fid, args, kwargs)
     if request.method == "POST":
         return create_a_fleet(request, fid, args, kwargs)
     if request.method == "PUT":
@@ -26,9 +25,9 @@ def fleet_id_dispatch(request, fid, *args, **kwargs):
     error = f"Unexpected HTTP method '{request.method}'"
     return Response(error, status=status.HTTP_404_NOT_FOUND)
 
+
 @api_view(['GET'])
 def show_fleet(request, id, *args, **kwargs):
-    ''' Show all details of a fleet. '''
     fleet = Fleet.objects.filter(id=id).first()
     if fleet is None:
         error = f"Fleet '{id}' not found"
@@ -39,7 +38,6 @@ def show_fleet(request, id, *args, **kwargs):
 
 def create_a_fleet(request, id, *args, **kwargs):
     name = request.POST.get('name')
-    if name is None:
     if name is None:
         error = "name was missing from post data"
         return Response(error, status=status.HTTP_400_BAD_REQUEST)
@@ -179,12 +177,12 @@ def update_a_bike(request, id, *args, **kwargs):
     return JsonResponse(data)
 
 
-def delete_a_bike(request, id, *args, **kwargs):
-    bike = Bike.objects.filter(id=id).first()
+def delete_a_bike(request, bid, *args, **kwargs):
+    bike = Bike.objects.filter(id=bid).first()
     if bike is None:
-        error = f"Bike '{id}' not found"
+        error = f"Bike '{bid}' not found"
     if bike is None:
-        error = f"Bike '{id}' not found"
+        error = f"Bike '{bid}' not found"
         return Response(error, status=status.HTTP_404_NOT_FOUND)
     data = BikeSerializer(bike).data
     bike.delete()
