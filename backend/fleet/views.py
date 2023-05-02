@@ -5,6 +5,7 @@ from rest_framework import status
 from .models import Fleet, Bike
 from .serializers import FleetSerializer, BikeSerializer
 
+class FleetList(APIView):
 
 from rest_framework.decorators import api_view
 
