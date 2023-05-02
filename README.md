@@ -12,6 +12,7 @@ $ cd cargoroo
 Create a virtual environment to install dependencies in and activate it:
 
 ```sh
+$ mkdir venv
 $ python -m venv venv
 $ source venv/bin/activate
 ```
