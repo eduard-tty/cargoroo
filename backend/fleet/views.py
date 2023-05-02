@@ -44,7 +44,7 @@ class FleetItem(APIView):
         )
     )
     def post(self, request, fid, *args, **kwargs):
-        name = request.POST.get('name')
+        name = request.data.get('name')
         if name is None:
             error = "name was missing from post data"
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
@@ -70,7 +70,7 @@ class FleetItem(APIView):
         if fleet is None:
             error = f"Fleet '{fid}' not found"
             return Response(error, status=status.HTTP_404_NOT_FOUND)
-        name = request.POST.get('name')
+        name = request.data.get('name')
         if name is not None:
             fleet.name = name
         fleet.save()
@@ -134,14 +134,14 @@ class BikeItem(APIView):
         )
     )
     def post(self, request, bid, *args, **kwargs):
-        fleet_id = request.POST.get('fleet')
-        bike_status = request.POST.get('status')
+        fleet_id = request.data.get('fleet')
+        bike_status = request.data.get('status')
         fleet = Fleet.objects.filter(id=fleet_id).first()
         if fleet is None:
             error = f"Fleet '{fleet_id}' not found"
             return Response(error, status=status.HTTP_404_NOT_FOUND)
-        lat = request.POST.get('latitude')
-        long = request.POST.get('longitude')
+        lat = request.data.get('latitude')
+        long = request.data.get('longitude')
         try:
             latitude = float(lat)
             longitude = float(long)
@@ -177,10 +177,10 @@ class BikeItem(APIView):
         )
     )
     def put(self, request, bid, *args, **kwargs):
-        fleet_id = request.POST.get('fleet')
-        lat = request.POST.get('latitude')
-        long = request.POST.get('longitude')
-        bike_status = request.POST.get('status')
+        fleet_id = request.data.get('fleet')
+        lat = request.data.get('latitude')
+        long = request.data.get('longitude')
+        bike_status = request.data.get('status')
         fleet = Fleet.objects.filter(id=fleet_id).first()
         if fleet is None:
             error = f"Fleet '{fleet_id}' not found"
