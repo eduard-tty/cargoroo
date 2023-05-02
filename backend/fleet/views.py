@@ -169,8 +169,8 @@ class BikeItem(APIView):
             type=openapi.TYPE_OBJECT,
             required=['fleet', 'status', 'latitude', 'longitude'],
             properties={
-                'fleet' : openapi.Schema(type=openapi.TYPE_STRING),   #TODO Foreign key
-                'status' : openapi.Schema(type=openapi.TYPE_STRING),  # TODO smehow enum
+                'fleet' : openapi.Schema(type=openapi.TYPE_STRING),
+                'status' : openapi.Schema(type=openapi.TYPE_STRING),
                 'latitude' : openapi.Schema(type=openapi.TYPE_NUMBER),
                 'longitude' : openapi.Schema(type=openapi.TYPE_NUMBER),
             }
