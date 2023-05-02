@@ -17,8 +17,5 @@ urlpatterns = [
     path('fleet/<str:fid>', views.FleetItem.as_view()),
     path('fleet/<str:fid>/bike', views.BikesInFleet.as_view()),
     path('bike/<str:bid>', views.BikeItem.as_view()),
-    path('', include([
-        path('', schema_view.with_ui(
-            'swagger', cache_timeout=0), name='swagger=schema')
-    ])),
+    path('', schema_view.with_ui()),
 ]
