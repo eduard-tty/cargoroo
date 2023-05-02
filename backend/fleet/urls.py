@@ -17,7 +17,7 @@ urlpatterns = [
     path('fleet/<str:fid>', views.fleet_id_dispatch),
     path('fleet/<str:fid>/bike', views.list_bikes_in_fleet),
     path('bike/<str:bid>', views.bike_id_dispatch),
-    path('docs/', include([
+    path('', include([
         path('', schema_view.with_ui('swagger', cache_timeout=0), name='swagger=schema')
     ])),
 ]
