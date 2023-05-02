@@ -94,7 +94,7 @@ class FleetItem(APIView):
         return JsonResponse(data)
 
     @swagger_auto_schema(
-        operation_summary='Delete a fleet (including all it\'s bikes!)',
+        operation_summary='Delete a fleet including all it\'s bikes!',
         operation_description='Delete the given fleet. THIS DELETES ALL BIKES IN THAT FLEET!',
         responses={
             status.HTTP_200_OK: 'Fleet deleted',
