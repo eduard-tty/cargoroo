@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_NUMBER, TYPE_STRING
 from drf_yasg import openapi
 from .serializers import FleetSerializer, BikeSerializer
 from .models import Fleet, Bike
@@ -13,16 +14,24 @@ class FleetList(APIView):
     @swagger_auto_schema(
         operation_summary='List all fleets',
         operation_description='List all fleets.',
+        responses={
+            status.HTTP_200_OK: 'Results returned',
+        },
     )
     def get(self, request, *args, **kwargs):
         data = [FleetSerializer(x).data for x in Fleet.objects.all()]
         return JsonResponse(data, safe=False)
+
 
 class FleetItem(APIView):
 
     @swagger_auto_schema(
         operation_summary='Fleet details',
         operation_description='List fields for a given fleet.',
+        responses={
+            status.HTTP_200_OK: 'Results returned',
+            status.HTTP_404_NOT_FOUND: 'Fleet not found'
+        },
     )
     def get(self, request, fid, *args, **kwargs):
         fleet = Fleet.objects.filter(id=fid).first()
@@ -35,24 +44,27 @@ class FleetItem(APIView):
     @swagger_auto_schema(
         operation_summary='Create a fleet',
         operation_description='Creater a new Fleet object',
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
+        request_body=Schema(
+            type=TYPE_OBJECT,
             required=['name'],
             properties={
-                'name' : openapi.Schema(type=openapi.TYPE_STRING)
+                'name': Schema(type=TYPE_STRING)
             }
-        )
+        ),
+        responses={
+            status.HTTP_201_CREATED: 'Fleet created',
+            status.HTTP_400_BAD_REQUEST: 'name was missing from post data'
+        },
     )
     def post(self, request, fid, *args, **kwargs):
         name = request.data.get('name')
         if name is None:
-            error = "name was missing from post data"
+            error = 'name was missing from post data'
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
         fleet = Fleet(id=fid, name=name)
         fleet.save()
         data = FleetSerializer(fleet).data
         return JsonResponse(data, status=status.HTTP_201_CREATED)
-
 
     @swagger_auto_schema(
         operation_summary='Update a fleet',
@@ -61,9 +73,13 @@ class FleetItem(APIView):
             type=openapi.TYPE_OBJECT,
             required=['name'],
             properties={
-                'name' : openapi.Schema(type=openapi.TYPE_STRING)
+                'name': openapi.Schema(type=openapi.TYPE_STRING)
             }
-        )
+        ),
+        responses={
+            status.HTTP_200_OK: 'Fleet udated',
+            status.HTTP_404_NOT_FOUND: 'Fleet not found'
+        },
     )
     def put(self, request, fid, *args, **kwargs):
         fleet = Fleet.objects.filter(id=fid).first()
@@ -77,10 +93,13 @@ class FleetItem(APIView):
         data = FleetSerializer(fleet).data
         return JsonResponse(data)
 
-
     @swagger_auto_schema(
         operation_summary='Delete a fleet (including all it\'s bikes!)',
         operation_description='Delete the given fleet. THIS DELETES ALL BIKES IN THAT FLEET!',
+        responses={
+            status.HTTP_200_OK: 'Fleet deleted',
+            status.HTTP_404_NOT_FOUND: 'Fleet not found'
+        },
     )
     def delete(self, request, fid, *args, **kwargs):
         fleet = Fleet.objects.filter(id=fid).first()
@@ -91,25 +110,36 @@ class FleetItem(APIView):
         fleet.delete()
         return JsonResponse(data)
 
+
 class BikesInFleet(APIView):
 
     @swagger_auto_schema(
         operation_summary='List bikes by fleet',
         operation_description='List all bikes in a given fleet.',
+        responses={
+            status.HTTP_200_OK: 'Results returned',
+            status.HTTP_404_NOT_FOUND: 'Fleet not found'
+        },
     )
     def get(self, request, fid, *args, **kwargs):
         fleet = Fleet.objects.filter(id=fid).first()
         if fleet is None:
             error = f"Fleet '{fid}' not found"
             return Response(error, status=status.HTTP_404_NOT_FOUND)
-        data = [BikeSerializer(x).data for x in Bike.objects.filter(fleet=fid).all()]
+        data = [BikeSerializer(
+            x).data for x in Bike.objects.filter(fleet=fid).all()]
         return JsonResponse(data, safe=False)
+
 
 class BikeItem(APIView):
 
     @swagger_auto_schema(
         operation_summary='Bike details',
         operation_description='List fields for a given bike.',
+        responses={
+            status.HTTP_200_OK: 'Results returned',
+            status.HTTP_404_NOT_FOUND: 'Bike not found'
+        },
     )
     def get(self, request, bid, *args, **kwargs):
         bike = Bike.objects.filter(id=bid).first()
@@ -126,12 +156,17 @@ class BikeItem(APIView):
             type=openapi.TYPE_OBJECT,
             required=['fleet', 'status', 'latitude', 'longitude'],
             properties={
-                'fleet' : openapi.Schema(type=openapi.TYPE_STRING),
-                'status' : openapi.Schema(type=openapi.TYPE_STRING),
-                'latitude' : openapi.Schema(type=openapi.TYPE_NUMBER),
-                'longitude' : openapi.Schema(type=openapi.TYPE_NUMBER),
+                'fleet': openapi.Schema(type=openapi.TYPE_STRING),
+                'status': openapi.Schema(type=openapi.TYPE_STRING),
+                'latitude': openapi.Schema(type=openapi.TYPE_NUMBER),
+                'longitude': openapi.Schema(type=openapi.TYPE_NUMBER),
             }
-        )
+        ),
+        responses={
+            status.HTTP_201_CREATED: 'Bike created',
+            status.HTTP_404_NOT_FOUND: 'Fleet not found',
+            status.HTTP_400_BAD_REQUEST: 'Fields not submitted correctly',
+        },
     )
     def post(self, request, bid, *args, **kwargs):
         fleet_id = request.data.get('fleet')
@@ -169,12 +204,17 @@ class BikeItem(APIView):
             type=openapi.TYPE_OBJECT,
             required=['fleet', 'status', 'latitude', 'longitude'],
             properties={
-                'fleet' : openapi.Schema(type=openapi.TYPE_STRING),
-                'status' : openapi.Schema(type=openapi.TYPE_STRING),
-                'latitude' : openapi.Schema(type=openapi.TYPE_NUMBER),
-                'longitude' : openapi.Schema(type=openapi.TYPE_NUMBER),
+                'fleet': openapi.Schema(type=openapi.TYPE_STRING),
+                'status': openapi.Schema(type=openapi.TYPE_STRING),
+                'latitude': openapi.Schema(type=openapi.TYPE_NUMBER),
+                'longitude': openapi.Schema(type=openapi.TYPE_NUMBER),
             }
-        )
+        ),
+        responses={
+            status.HTTP_200_OK: 'Bike updated',
+            status.HTTP_404_NOT_FOUND: 'Fleet and/or bike not found',
+            status.HTTP_400_BAD_REQUEST: 'Fields not submitted correctly',
+        },
     )
     def put(self, request, bid, *args, **kwargs):
         fleet_id = request.data.get('fleet')
@@ -210,6 +250,10 @@ class BikeItem(APIView):
     @swagger_auto_schema(
         operation_summary='Delete a bike',
         operation_description='Delete a Bike Object.',
+         responses={
+            status.HTTP_200_OK: 'Bike deleted',
+            status.HTTP_404_NOT_FOUND: 'Bike not found',
+        },
     )
     def delete(self, request, bid, *args, **kwargs):
         bike = Bike.objects.filter(id=bid).first()
